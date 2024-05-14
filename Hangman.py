@@ -1,3 +1,5 @@
+import os
+
 # ASCII art for Hangman
 HANGMAN_ASCII_ART = """
 Welcome to the game Hangman
@@ -93,20 +95,35 @@ HANGMAN_PHOTOS = {1: "                      x-------x",
                   }
 
 
-# Function to check if the guessed letter is valid
-def is_valid_input(letter_guessed):
-    # if it's not one letter in english will return false
-    if (len(letter_guessed) != 1) or (not letter_guessed.isalpha()):
+def print_start_game():
+    """Print the starting game message and the maximum number of tries allowed"""
+    print(HANGMAN_ASCII_ART, '\n', MAX_TRIES)
+
+
+def check_valid_input(letter_guessed, old_letters_guessed):
+    """
+    Checks if the letter guessed is valid and not already guessed.
+    Param: letter_guessed - the letter that the user guessed
+    Param: old_letters_guessed - the letters that the user already guessed
+    Return: True if the input is valid (a single letter, alphabetic, and not guessed before); False otherwise
+    """
+    is_letter_in_array = letter_guessed in old_letters_guessed
+    if (len(letter_guessed) != 1) or (not letter_guessed.isalpha() or is_letter_in_array):
         return False
     return True
 
 
-# Function to try updating the guessed letter
+
 def try_update_letter_guessed(letter_guessed, old_letters_guessed):
-    # Check if letter is already guessed
-    is_letter_in_array = letter_guessed in old_letters_guessed
+    """
+    Attempts to update the list of guessed letters with the new guess.
+    Param: letter_guessed - The letter that the user guessed
+    Param: old_letters_guessed - The list of letters that have already been guessed
+    Return: True if the letter was successfully added, False otherwise
+    """
+    
     # Check if letter is valid and not already guessed
-    if is_valid_input(letter_guessed) and (not is_letter_in_array):
+    if check_valid_input(letter_guessed, old_letters_guessed):
         old_letters_guessed.append(letter_guessed)
         return True
 
@@ -118,8 +135,13 @@ def try_update_letter_guessed(letter_guessed, old_letters_guessed):
     return False
 
 
-# Function to show the hidden word with guessed letters revealed
 def show_hidden_word(secret_word, old_letters_guessed):
+    """
+    Displays the secret word with guessed letters revealed and underscores for unguessed letters.
+    Param: secret_word - The word the player is trying to guess
+    Param: old_letters_guessed - The list of letters that have already been guessed
+    Return: A string representing the partially guessed word
+    """
     displayed_word = ""
     for letter in secret_word:
         if letter in old_letters_guessed:
@@ -129,55 +151,94 @@ def show_hidden_word(secret_word, old_letters_guessed):
     return displayed_word
 
 
-# check if plater won (guessed all characters of the word to guess)
 def check_win(secret_word, old_letters_guessed):
+    """
+    Checks if the player has successfully guessed all letters in the secret word.
+    Param: secret_word - The word the player is trying to guess
+    Param: old_letters_guessed - The list of letters that have already been guessed
+    Return: True if the player has won (all letters guessed), False otherwise
+    """
     displayed_word = show_hidden_word(secret_word, old_letters_guessed)
     if '_' in displayed_word:
         return False
     return True
 
 
-# print the current hangman photo
 def print_hangman(num_of_tries):
+    """
+    Prints the current stage of the hangman drawing based on the number of incorrect tries.
+    Param: num_of_tries - The current number of incorrect guesses
+    """
     print(HANGMAN_PHOTOS[num_of_tries])
 
 
-# Main game function
+def choose_word(file_path, index):
+    """
+    Selects a word from a file at a given index, wrapping around if the index exceeds the file length.
+    Param: file_path - Path to the file containing possible secret words
+    Param: index - The index to pick the word from
+    Return: The chosen word from the file
+    """
+    with open(file_path, 'r') as file:
+        words = file.read().split()
+    # return the word in the index
+    return words[(index - 1) % len(words)]
+
+
 def hangman():
-    print(HANGMAN_ASCII_ART, '\n', MAX_TRIES)
-    secret_word = input("Please enter a word: ")
+    """Main function to start and manage the game of Hangman."""
+    # print the starting game message and art
+    print_start_game()
+    # get the path of the file with the words
+    path = input("Please enter the path of the file: ")
+    # get the index of the word to guess
+    index = input("Please enter a random number: ")
+    # get the word from the file in the index
+    secret_word = choose_word(path, int(index))
 
     # Initialize the list of guessed letters
     old_letters_guessed = []
 
     print_hangman(1)  # print the starting point of the hangman
 
-    i = 0  # initialize loop counter to 0
+    num_of_tries = 0  # initialize loop counter to 0
 
-    while i < MAX_TRIES:
-        # Print the hidden word with '_' and the letters already guessed
-        print(show_hidden_word(secret_word, old_letters_guessed))
+    # Print the hidden word with '_' and the letters already guessed
+    print(show_hidden_word(secret_word, old_letters_guessed))
+
+    while num_of_tries < MAX_TRIES:
+
         # get the letter guessed and put in lower case (if not letter won't do anything)
         letter_guessed = input("Guess a letter: ")
         print(letter_guessed)  # print the input
+
+        os.system("cls") # clear terminal
+
         # update letter guessed and check if valid and already guessed
         check_valid = try_update_letter_guessed(letter_guessed.lower(), old_letters_guessed)
-        #  if input not valid or already guessed letter
+
+        #  if input not valid or already guessed go to next iteration
         if not check_valid:
             continue
+
         #  if letter not in the word to guess
         if letter_guessed not in secret_word:
+            print("):")
             # add one to loop counter (adds one to disqualification)
-            i += 1
-            print_hangman(i + 1)
+            num_of_tries += 1
+            print_hangman(num_of_tries + 1)
+        
+        # Print the hidden word with '_' and the letters already guessed
+        print(show_hidden_word(secret_word, old_letters_guessed))
 
         # checks if player won and if did end the loop
         if check_win(secret_word, old_letters_guessed):
             print(WON_ASCII)
             break
 
-    if i == MAX_TRIES:
+    if num_of_tries == MAX_TRIES:
         print(LOST_ASCII)
+        print(f"The word was: {secret_word}")
 
 
 # Main function to start the game
