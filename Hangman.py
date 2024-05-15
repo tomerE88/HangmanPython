@@ -192,14 +192,9 @@ def choose_word(file_path, index):
     # return the word in the index
     return words[(index - 1) % len(words)]
 
-
-def hangman():
-    """Main function to start and manage the game of Hangman."""
-    # print the starting game message and art
-    print_start_game()
-    # get the path of the file with the words
+def get_file_path():
+    """Get the path of the file with the words"""
     path = input("Please enter the path of the file: ")
-
     does_exists = os.path.exists(path)  # check if the file exists
     # if the file does not exist
     while not does_exists:
@@ -207,7 +202,9 @@ def hangman():
         # get the path of the file with the words
         path = input("Please enter the path of the file: ")
         does_exists = os.path.exists(path)
+    return path
 
+def get_random_word(path):
     # get the index of the word to guess
     index = input("Please enter a random number: ")
     # if the input is not a number
@@ -217,6 +214,17 @@ def hangman():
         index = input("Please enter a random number: ")
     # get the word from the file in the index
     secret_word = choose_word(path, int(index))
+    return secret_word
+
+
+def hangman():
+    """Main function to start and manage the game of Hangman."""
+    # print the starting game message and art
+    print_start_game()
+    # get the path of the file with the words
+    path = get_file_path()
+
+    secret_word = get_random_word(path)  # get the word to guess
 
     # Initialize the list of guessed letters
     old_letters_guessed = []
