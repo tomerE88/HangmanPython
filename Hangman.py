@@ -262,6 +262,7 @@ def hangman():
         # checks if player won and if did end the loop
         if check_win(secret_word, old_letters_guessed):
             print(WON_ASCII)
+            num_of_tries = 0 # will not enter the losing message
             # end the loop
             break
 
