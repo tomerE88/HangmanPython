@@ -231,13 +231,13 @@ def hangman():
     while num_of_tries < MAX_TRIES: # loop until player wins or loses
 
         # get the letter guessed and put in lower case (if not letter won't do anything)
-        letter_guessed = input("Guess a letter: ")
+        letter_guessed = input("Guess a letter: ").lower()
         print(letter_guessed)  # print the input
 
         os.system("cls") # clear terminal
 
         # update letter guessed and check if valid and already guessed
-        check_valid = try_update_letter_guessed(letter_guessed.lower(), old_letters_guessed)
+        check_valid = try_update_letter_guessed(letter_guessed, old_letters_guessed)
 
         #  if input not valid or already guessed go to next iteration
         if not check_valid:
