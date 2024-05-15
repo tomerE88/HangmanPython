@@ -236,6 +236,10 @@ def hangman():
 
         #  if input not valid or already guessed go to next iteration
         if not check_valid:
+            # print the current hangman
+            print_hangman(num_of_tries + 1)
+            # Print the hidden word with '_' and the letters already guessed
+            print(show_hidden_word(secret_word, old_letters_guessed))
             # continue to the next iteration
             continue
 
@@ -244,7 +248,8 @@ def hangman():
             print("):")
             # add one to loop counter (adds one to disqualification)
             num_of_tries += 1
-            print_hangman(num_of_tries + 1)
+        # print the current hangman
+        print_hangman(num_of_tries + 1)
         
         # Print the hidden word with '_' and the letters already guessed
         print(show_hidden_word(secret_word, old_letters_guessed))
