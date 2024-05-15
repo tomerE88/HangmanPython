@@ -210,6 +210,11 @@ def hangman():
 
     # get the index of the word to guess
     index = input("Please enter a random number: ")
+    # if the input is not a number
+    while not index.isdigit():
+        print("The input is not a number")
+        # get the index of the word to guess
+        index = input("Please enter a random number: ")
     # get the word from the file in the index
     secret_word = choose_word(path, int(index))
 
