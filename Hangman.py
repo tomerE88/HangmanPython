@@ -107,7 +107,9 @@ def check_valid_input(letter_guessed, old_letters_guessed):
     Param: old_letters_guessed - the letters that the user already guessed
     Return: True if the input is valid (a single letter, alphabetic, and not guessed before); False otherwise
     """
+    # check if the letter is in the list of guessed letters
     is_letter_in_array = letter_guessed in old_letters_guessed
+    # check if the letter is not a single letter or not alphabetic or already guessed
     if (len(letter_guessed) != 1) or (not letter_guessed.isalpha() or is_letter_in_array):
         return False
     return True
@@ -129,7 +131,9 @@ def try_update_letter_guessed(letter_guessed, old_letters_guessed):
 
     # Print 'X' and the sorted list of guessed letters with '->' between them
     print('X')
+    # sort the list of guessed letters
     old_letters_guessed.sort()
+    # join the list of guessed letters with '->' between them
     sort_with_arrows = ' -> '.join(old_letters_guessed)
     print(sort_with_arrows)
     return False
@@ -143,10 +147,14 @@ def show_hidden_word(secret_word, old_letters_guessed):
     Return: A string representing the partially guessed word
     """
     displayed_word = ""
+    # for each letter in the secret word
     for letter in secret_word:
+        # if the letter is in the list of guessed letters
         if letter in old_letters_guessed:
+            # add the letter to the displayed word
             displayed_word += letter + ' '
         else:
+            # add an underscore to the displayed word
             displayed_word += '_ '
     return displayed_word
 
@@ -159,7 +167,7 @@ def check_win(secret_word, old_letters_guessed):
     Return: True if the player has won (all letters guessed), False otherwise
     """
     displayed_word = show_hidden_word(secret_word, old_letters_guessed)
-    if '_' in displayed_word:
+    if '_' in displayed_word: # if there are still hidden letters
         return False
     return True
 
@@ -191,6 +199,15 @@ def hangman():
     print_start_game()
     # get the path of the file with the words
     path = input("Please enter the path of the file: ")
+
+    does_exists = os.path.exists(path)  # check if the file exists
+    # if the file does not exist
+    while not does_exists:
+        print("The file does not exist")
+        # get the path of the file with the words
+        path = input("Please enter the path of the file: ")
+        does_exists = os.path.exists(path)
+
     # get the index of the word to guess
     index = input("Please enter a random number: ")
     # get the word from the file in the index
@@ -206,7 +223,7 @@ def hangman():
     # Print the hidden word with '_' and the letters already guessed
     print(show_hidden_word(secret_word, old_letters_guessed))
 
-    while num_of_tries < MAX_TRIES:
+    while num_of_tries < MAX_TRIES: # loop until player wins or loses
 
         # get the letter guessed and put in lower case (if not letter won't do anything)
         letter_guessed = input("Guess a letter: ")
@@ -219,6 +236,7 @@ def hangman():
 
         #  if input not valid or already guessed go to next iteration
         if not check_valid:
+            # continue to the next iteration
             continue
 
         #  if letter not in the word to guess
@@ -234,8 +252,10 @@ def hangman():
         # checks if player won and if did end the loop
         if check_win(secret_word, old_letters_guessed):
             print(WON_ASCII)
+            # end the loop
             break
 
+    # if player lost
     if num_of_tries == MAX_TRIES:
         print(LOST_ASCII)
         print(f"The word was: {secret_word}")
